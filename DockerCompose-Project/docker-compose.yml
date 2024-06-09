@@ -1,35 +1,33 @@
 version: '3'
 services:
-  frontend: 
-    container_name: frontend
+  backend:
     build: 
-      context: frontend/
-    image: fronted-image
-    ports: 
-      - "80:80"
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=mydatabase
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
     depends_on:
       - backend
-  backend:
-    container_name: backend
-    build: 
-      context: backend/
-    image: backend-image
-    ports: 
-      - "3500:3500"
+
+  mysql:
+    image: mysql:5.7
+    restart: always
     environment:
-      - MYSQL_HOST=mysql-container
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=mysql123
-      - MYSQL_DATABASE=school
-    depends_on:
-      - db
-  db:
-    container_name: mysql-container
-    image: mysql:latest
-    environment:
-      - MYSQL_ROOT_PASSWORD=mysql123
-      - MYSQL_DATABASE=school
-    volumes:
-      - mysql-data:/var/lib/mysql
-volumes:
-  mysql-data:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydatabase
+    ports:
+      - "3306:3306"
